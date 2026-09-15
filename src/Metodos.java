@@ -1,4 +1,5 @@
 import java.io.*;
+import java.util.Objects;
 
 public class Metodos {
     private String cadea;
@@ -10,9 +11,9 @@ public class Metodos {
         File archivo = new File(cadea);
 
         if (archivo.isDirectory()) {
-            return "é directorio";
+            return"é directorio";
         } else {
-            return "non é directorio";
+            return"non é directorio";
         }
     }
 
@@ -27,9 +28,9 @@ public class Metodos {
         File archivo = new File(cadea);
 
         if (archivo.isFile()) {
-            return "é directorio";
+            return"é ficheiro";
         } else {
-            return "non é directorio";
+            return "non é ficheiro";
         }
     }
 
@@ -67,47 +68,53 @@ public class Metodos {
         }
     }
 
-    public void modoAcceso(String dirName, String fileName) {
+    public String modoAcceso(String dirName, String fileName) {
         File archivo = new File(dirName, fileName);
 
-        if (archivo.canWrite()) {
-            System.out.println("escritura si");
+        if (archivo.canRead() && archivo.canWrite()) {
+            return "Lectura y escritura permitidas";
+        } else if (archivo.canRead()) {
+            return "lectura si";
+        } else if (archivo.canWrite()) {
+            return "escritura si";
         } else {
-            System.out.println("escritura non");
-        }
-
-        if (archivo.canRead()) {
-            System.out.println("lectura si");
-        } else {
-            System.out.println("lectura non");
+            return "Algo ha fallado en la lectura-escritura";
         }
     }
 
-    public long calculaLonxitude(String dirName, String fileName) {
+    public String calculaLonxitude(String dirName, String fileName) {
         File archivo = new File(dirName, fileName);
-        return archivo.length();
+        if (archivo.exists() && archivo.isFile()) {
+            return "A lonxitude de " + fileName + " é: " + archivo.length() + " bytes.";
+        } else {
+            return "O arquivo non existe ou non é un ficheiro válido.";
+        }
     }
 
-    public void mLectura(String dirName, String fileName) {
+    public String mLectura(String dirName, String fileName) {
         File archivo = new File(dirName, fileName);
         try (BufferedReader lector = new BufferedReader(new FileReader(archivo))) {
-            String linea;
+            String linea = "";
+            String texto = "";
             while ((linea = lector.readLine()) != null) {
-                System.out.println(linea);
+                texto = texto + linea;
+                return texto;
             }
         } catch (IOException e) {
-            System.out.println("Ocurrió un error al leer el archivo: " + e.getMessage());
+            return "Ocurrió un error al leer el archivo: " + e.getMessage();
         }
+        return "Algo ha fallado antes de leer";
     }
 
 
-    public void mEscritura(String dirName, String fileName) {
+    public String mEscritura(String dirName, String fileName) {
         File archivo = new File(dirName, fileName);
         try (FileWriter escritor = new FileWriter(archivo)) {
             escritor.write("Hola Mundo. ");
             escritor.write("Esto sigue en la misma línea.");
+            return "Se a escrito de forma correcta";
         } catch (IOException e) {
-            System.out.println("Ocurrió un error al escribir el archivo: " + e.getMessage());
+            return "Ocurrió un error al escribir el archivo: " + e.getMessage();
         }
     }
 
@@ -126,11 +133,11 @@ public class Metodos {
         }
     }
 
-    public String borrarDirectorio(String fileName) {
-        String resultado = eDirectorio(fileName);
+    public String borrarDirectorio(String direName) {
+        String resultado = eDirectorio(direName);
 
-        if (resultado == "non é directorio") {
-            File archivo = new File(fileName);
+        if (Objects.equals(resultado, "é directorio")) {
+            File archivo = new File(direName);
             if (archivo.delete()) {
                 return "Se borro correctamente";
             } else {
@@ -141,36 +148,39 @@ public class Metodos {
         }
     }
 
-    public void mContido(String dirName) {
+    public String mContido(String dirName) {
         File dir = new File(dirName);
         if (dir.exists() && dir.isDirectory()) {
             File[] elementos = dir.listFiles();
             if (elementos != null) {
+                StringBuilder resultado = new StringBuilder();
                 for (File elem : elementos) {
-                    String tipo = elem.isDirectory() ? "[DIR] " : "[ARQ] ";
-                    System.out.println(tipo + elem.getName());
+                     String tipo = elem.isDirectory() ? "[DIR] " : "[ARQ] ";
+                     resultado.append(tipo).append(elem.getName()).append("\n");
                 }
+                return resultado.toString();
             }
         } else {
-            System.out.println("A ruta non existe ou non é un directorio válido.");
+            return"A ruta non existe ou non é un directorio válido.";
         }
+        return"Algo ha fallado antes de ver el contido";
     }
 
-    public void recur(File dir) {
+    public String recur(File dir) {
         if (dir != null && dir.exists() && dir.isDirectory()) {
             File[] elementos = dir.listFiles();
             if (elementos != null) {
                 for (File elem : elementos) {
                     if (elem.isDirectory()) {
-                        System.out.println("[DIR]  " + elem.getAbsolutePath());
+                        String total = "[DIR]  " + elem.getAbsolutePath();
                         recur(elem);
+                        return total;
                     } else {
-                        System.out.println("[ARQ]  " + elem.getAbsolutePath());
+                        return"[ARQ]  " + elem.getAbsolutePath();
                     }
                 }
             }
-        }
+        } return"No es directorioi o no existe";
     }
-
 }
 
